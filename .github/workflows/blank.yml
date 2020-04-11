@@ -1,0 +1,57 @@
+name: Release to Nexus
+on:
+  repository_dispatch:
+    types: [release]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK and Maven
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Prepare files
+        run: |
+          echo "*********Alter m2 settings.xml************"
+          rm -rf ~/.m2/settings.xml
+          cp src/main/resources/m2-settings.xml ~/.m2/settings.xml
+          echo "*************Replace passes***************"
+          sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
+          sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
+      - name: Do the release
+        run: |
+          git config --global user.name "stefmil"
+          git config --global user.email "moonwalker13@gmail.com"
+          echo "**************Release****************"
+          echo "Version to bump: ${{ github.event.client_payload.version }}"
+          if [[ "${{ github.event.client_payload.version }}" == "major" ]]; then
+              mvn -Dusername=${{ secrets.GITHUB_ACTOR }} -Dpassword=${{ secrets.GITHUB_TOKEN }} --batch-mode clean build-helper:parse-version release:prepare release:perform -DreleaseVersion=\${parsedVersion.nextMajorVersion}.0.0 -DdevelopmentVersion=\${parsedVersion.nextMajorVersion}.0.1-SNAPSHOT -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
+          elif [[ "${{ github.event.client_payload.version }}" == "minor" ]]; then
+              mvn -Dusername=${{ secrets.GITHUB_ACTOR }} -Dpassword=${{ secrets.GITHUB_TOKEN }} --batch-mode clean build-helper:parse-version release:prepare release:perform -DreleaseVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.1-SNAPSHOT -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
+          elif [[ "${{ github.event.client_payload.version }}" == "patch" ]]; then
+              mvn -Dusername=${{ secrets.GITHUB_ACTOR }} -Dpassword=${{ secrets.GITHUB_TOKEN }} --batch-mode clean release:prepare release:perform -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
+          fi
+      - name: Maven release patch
+        if: 'false'
+        uses: qcastel/github-actions-maven-release@v1.0.3
+        with:
+          maven-args: "--batch-mode clean release:prepare release:perform -Dresume=false -DdryRun=false -DskipTests=true"
+          # The git user name for commiting the release
+          git-release-bot-name: stefmil
+          # The git user email for commiting the release
+          git-release-bot-email: moonwalker13@gmail.com
+          # Github access token. https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+          access-token: ${{secrets.GITHUB_TOKEN}}
+      - name: Commit files
+        if: 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Update snapshot version" -a
+      - name: Push back updated version
+        if: 'false'
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
