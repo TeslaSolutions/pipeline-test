@@ -21,6 +21,7 @@ jobs:
           sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
       - name: Do the release
+        if: 'false'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -33,6 +34,23 @@ jobs:
           elif [[ "${{ github.event.client_payload.version }}" == "patch" ]]; then
               mvn -Dpassword=${{ secrets.ALL_TOKEN }} --batch-mode clean release:prepare release:perform -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
           fi
+      - name: Maven release
+        uses: qcastel/github-actions-maven-release@v1.0.3
+        with:
+          # Maven server repository id to push the artefacts to
+          maven-repo-server-id: ossrh
+          # Maven server repository username
+          maven-repo-server-username: stefmil
+          # Maven server repository password
+          maven-repo-server-password: ${{NEXUS_PASS}}
+          # The maven arguments for the release
+          maven-args: "-Dmaven.test.skip=true -DskipTests"
+          # The git user name for commiting the release
+          git-release-bot-name: action
+          # The git user email for commiting the release
+          git-release-bot-email: action@github.com
+          # Github access token. https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+          access-token: ${{secrets.ALL_TOKEN}}
       - name: Commit files
         if: 'false'
         run: |
