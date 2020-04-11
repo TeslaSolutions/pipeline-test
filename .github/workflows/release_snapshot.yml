@@ -1,0 +1,37 @@
+name: Release Snapshot to Nexus
+on:
+  repository_dispatch:
+    types: [release_snapshot]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK and Maven
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Prepare files
+        run: |
+          echo "*********Alter m2 settings.xml************"
+          rm -rf ~/.m2/settings.xml
+          cp src/main/resources/m2-settings.xml ~/.m2/settings.xml
+          echo "*************Replace passes***************"
+          sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
+          sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
+      - name: Do the release
+        run: |
+          echo "**************Release****************"
+          mvn versions:set -DnewVersion=${{ github.event.client_payload.version }}
+          mvn versions:commit
+          mvn clean deploy -P release -DskipTests=true
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Update snapshot version" -a
+      - name: Push back updated version
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
