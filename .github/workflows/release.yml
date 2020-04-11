@@ -42,7 +42,7 @@ jobs:
           # Maven server repository username
           maven-repo-server-username: stefmil
           # Maven server repository password
-          maven-repo-server-password: ${{NEXUS_PASS}}
+          maven-repo-server-password: ${{secrets.NEXUS_PASS}}
           # The maven arguments for the release
           maven-args: "-Dmaven.test.skip=true -DskipTests"
           # The git user name for commiting the release
