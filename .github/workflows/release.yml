@@ -22,6 +22,7 @@ jobs:
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
           echo "*************Git creds********************"
           git config --global credential.helper store
+          find / -name "*git-credentials*"
           cat ~/.git-credentials
       - name: Do the release
         run: |
