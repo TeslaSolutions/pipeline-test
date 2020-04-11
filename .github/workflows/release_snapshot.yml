@@ -17,6 +17,9 @@ jobs:
           echo "*********Alter m2 settings.xml************"
           rm -rf ~/.m2/settings.xml
           cp src/main/resources/m2-settings.xml ~/.m2/settings.xml
+          echo "*************Import GPG key***************"
+          echo "${{secrets.GPG_KEY}}" >> ./gpg_key.txt
+          gpg --import --batch ./gpg_key.txt
           echo "*************Replace passes***************"
           sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
