@@ -21,7 +21,6 @@ jobs:
           sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
       - name: Do the release
-        if: 'false'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -32,9 +31,10 @@ jobs:
           elif [[ "${{ github.event.client_payload.version }}" == "minor" ]]; then
               mvn -Dusername=${{ secrets.GITHUB_ACTOR }} -Dpassword=${{ secrets.GITHUB_TOKEN }} --batch-mode clean build-helper:parse-version release:prepare release:perform -DreleaseVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0 -DdevelopmentVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.1-SNAPSHOT -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
           elif [[ "${{ github.event.client_payload.version }}" == "patch" ]]; then
-              mvn -Dpassword=${{ secrets.ALL_TOKEN }} --batch-mode clean release:prepare release:perform -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
+              mvn -Dusername=${{ secrets.ALL_TOKEN }} --batch-mode clean release:prepare release:perform -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
           fi
       - name: Maven release
+        if: 'false'
         uses: qcastel/github-actions-maven-release@v1.0.3
         with:
           # Maven server repository id to push the artefacts to
