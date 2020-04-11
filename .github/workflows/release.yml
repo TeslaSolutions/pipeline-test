@@ -22,8 +22,8 @@ jobs:
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
       - name: Do the release
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.email "moonwalker13@gmail.com"
+          git config --global user.name "Stefan Milosevski"
           echo "**************Release****************"
           echo "Version to bump: ${{ github.event.client_payload.version }}"
           if [[ "${{ github.event.client_payload.version }}" == "major" ]]; then
