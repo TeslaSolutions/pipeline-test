@@ -15,8 +15,12 @@ jobs:
       - name: Prepare files
         run: |
           echo "*********Alter m2 settings.xml************"
+          cat ~/.m2/settings.xml
           rm -rf ~/.m2/settings.xml
+          echo "*******************************************"
           cp src/main/resources/m2-settings.xml ~/.m2/settings.xml
+          cat ~/.m2/settings.xml
+          echo "*******************************************"
           echo "*************Replace passes***************"
           sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
