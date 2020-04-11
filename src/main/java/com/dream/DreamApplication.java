@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.dream")
-@EntityScan(basePackages = "com.dream.models")
-@EnableJpaRepositories(basePackages = "com.dream.repositories")
+@EntityScan(basePackages = "com.dream")
+@EnableJpaRepositories(basePackages = "com.dream")
 @EnableAutoConfiguration
 @ConfigurationPropertiesScan
 public class DreamApplication {
