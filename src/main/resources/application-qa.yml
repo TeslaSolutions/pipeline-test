@@ -1,0 +1,34 @@
+server:
+  port: 8097
+  servlet:
+    context-path: /api
+
+spring:
+  datasource:
+    url: jdbc:mysql://b11c20d8b0072b:63724c3c@us-cdbr-iron-east-05.cleardb.net/heroku_e02a8e301fce012?reconnect=true&useUnicode=yes&characterEncoding=UTF-8
+    username: b11c20d8b0072b
+    password: 63724c3c
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    properties.hibernate.format_sql: true
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    async:
+      #keep SSE HTTP connection open for 6 hours
+      request-timeout: 21600000
+jwt:
+  header: Authorization
+  secret: mySecret
+  expiration: 86400000
+
+sse_interval: 15 #Number of seconds to pass after sending object via sse, in order to send another one
+sse_timeout: 30 #Number of seconds after which clients will be disconnected from sse stream
+
+logging:
+  config: classpath:log4j2.xml
+  level:
+    org.springframework: INFO

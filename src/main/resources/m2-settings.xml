@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+
+	<profiles>
+		<profile>
+			<id>ossrh</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gpg.executable>gpg2</gpg.executable>
+				<gpg.passphrase>GPG_PASS_REPLACE_ME</gpg.passphrase>
+			</properties>
+		</profile>
+
+
+	</profiles>
+
+	<servers>
+		<server>
+			<id>github</id>
+			<username>${env.GITHUB_ACTOR}</username>
+			<password>${env.GITHUB_TOKEN}</password>
+		</server>
+		<server>
+			<id>ossrh</id>
+			<username>stefmil</username>
+			<password>NEXUS_PASS_REPLACE_ME</password>
+		</server>
+	</servers>
+</settings>
