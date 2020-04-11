@@ -1,11 +1,14 @@
 name: Release Snapshot to Nexus
 on:
   repository_dispatch:
-    types: [release_snapshot]
+    types: [release]
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.event.client_payload.release_version }}
+      DEVELOPMENT_VERSION: ${{ github.event.client_payload.development_version }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK and Maven
@@ -23,19 +26,28 @@ jobs:
           echo "*************Replace passes***************"
           sed -i 's/GPG_PASS_REPLACE_ME/${{secrets.GPG_PASS}}/g' ~/.m2/settings.xml
           sed -i 's/NEXUS_PASS_REPLACE_ME/${{secrets.NEXUS_PASS}}/g' ~/.m2/settings.xml
-          cat ~/.m2/settings.xml
+          echo "**********Updating Git params*************"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
       - name: Do the release
         run: |
           echo "**************Release****************"
-          mvn versions:set -DnewVersion=${{ github.event.client_payload.version }}
+          mvn versions:set -DnewVersion=$RELEASE_VERSION
           mvn versions:commit
           mvn clean deploy -P release -DskipTests=true
-      - name: Commit files
+      - name: Commit release version
+        run: git commit -m "Release" -a
+      - name: Push back updated release version
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tagging release version
+        run: git tag -a v$RELEASE_VERSION -m "Tagging release version $RELEASE_VERSION"
+      - name: Commit development version
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -m "Update snapshot version" -a
-      - name: Push back updated version
+          mvn versions:set -DnewVersion=$DEVELOPMENT_VERSION
+          git commit -m "Next development version" -a
+      - name: Push back updated development version
         uses: ad-m/github-push-action@v0.5.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
