@@ -12,7 +12,7 @@
 
 	<groupId>com.github.gorans90</groupId>
 	<artifactId>pipeline-test</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>pipeline-test</name>
