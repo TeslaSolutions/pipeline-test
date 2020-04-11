@@ -211,6 +211,7 @@
 								</goals>
 								<configuration>
 									<!-- Prevent `gpg` from using pinentry programs -->
+									<!--https://github.com/samuelmeuli/action-maven-publish/issues/1 -->
 									<gpgArguments>
 										<arg>--pinentry-mode</arg>
 										<arg>loopback</arg>
