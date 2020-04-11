@@ -27,7 +27,6 @@ jobs:
           echo "**************Release****************"
           echo "actor - ${{ secrets.GITHUB_ACTOR }}"
           echo "else - ${{ secrets.GITHUB_TOKEN }}"
-          echo "autor mail - ${{GIT_AUTHOR_EMAIL}}"
           echo "Version to bump: ${{ github.event.client_payload.version }}"
           if [[ "${{ github.event.client_payload.version }}" == "major" ]]; then
               mvn -Dusername=${{ secrets.GITHUB_ACTOR }} -Dpassword=${{ secrets.GITHUB_TOKEN }} --batch-mode clean build-helper:parse-version release:prepare release:perform -DreleaseVersion=\${parsedVersion.nextMajorVersion}.0.0 -DdevelopmentVersion=\${parsedVersion.nextMajorVersion}.0.1-SNAPSHOT -Dresume=false -DdryRun=false -Darguments="-Dmaven.test.skip=true -DskipTests"
